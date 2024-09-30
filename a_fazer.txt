@@ -1,0 +1,14 @@
+* Criar funções{
+
+ 
+}
+
+* Implementar prevenção de erros nas funções{
+ 
+
+
+}
+
+
+ 
+ 

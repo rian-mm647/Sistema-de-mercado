@@ -1,0 +1,8 @@
+0A932,Achocolatado Nescau,10.75,100
+1234,Achocolatado Toddy,9.90,170
+50EMIL792,Genipapo,7.99,50
+12345,Massa espaguete,3.00,2500
+0A498,Papel higiˆnico,12.00,300
+0B788,Pente de cabelo,1.50,100
+A0302,PÆo,1.00,999
+1G4067,Ovo,1.00,150
