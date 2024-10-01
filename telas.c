@@ -21,8 +21,9 @@ void mensagemInicial(){
 
 void menuPrincipal(){
     int opcao;
-    while(opcao!=5){
-        printf("1 - Cadastro de produto\n2 - Atualizar produto\n3 - Listar produtos em estoque\n4 - Comprar\n5 - Sair\n\nDigite o numero da opção desejada: ");
+    while(opcao!=4){
+        printf("\t\t-=-=-=-=-=MENU PRINCIPAL=-=-=-=-=-\n\n");
+        printf("1 - Cadastro de produto\n2 - Listar produtos em estoque\n3 - Comprar\n4 - Sair\n\nDigite o numero da opção desejada: ");
         scanf("%d", &opcao);
         switch (opcao)
         {
@@ -34,16 +35,13 @@ void menuPrincipal(){
             menuCadastro();
             break;
         case 2:
-            //menu atualizar produto
-            break;
-        case 3:
             system("cls");
             printf("Listando produtos...");
             sleep(1);
             system("cls");
             listarProdutos();   
             break;
-        case 4:
+        case 3:
             system("cls");
             printf("Redirecionando ao menu de compras...");
             sleep(1);
@@ -51,18 +49,18 @@ void menuPrincipal(){
             menuCompra();
             break;
         default:
-            //mensagem de advertencia
+            printf("ERRO: Opção inválida!!");
+            system("cls");
             break;
         }
     }
-    if (opcao == 5)
+    if (opcao == 4)
     {
         system("cls");
         printf("O MERCADO DO POVO AGRADACE A PREFERÊNCIA, VOLTE SEMPRE!");
         sleep(2);
         exit;
     }
-    
 }
 
 int desejaContinuar(){
@@ -79,7 +77,8 @@ int desejaContinuar(){
 
 void menuCadastro(){
     Produto novoProduto;
-    while(1){
+    int concluido;
+    while(concluido != 1){
         printf("\t -=-=-=-=CADASTRO DE NOVO PRODUTO=-=-=-=-\n\n");
         coletarCodigoProduto(&novoProduto);
         coletarNomeProduto(&novoProduto);
@@ -90,6 +89,7 @@ void menuCadastro(){
             cadastrarProduto(novoProduto);
             printf("\n\nProduto cadastrado com sucesso!\n");
             system("pause");
+            concluido = 1;
         } else {
             system("cls");
             printf("\n\nRedirecionando ao cadastro de produto...");
@@ -193,11 +193,13 @@ void listarProdutos(){
 
 void menuCompra(){
     Carrinho novoCarrinho;
+    novoCarrinho.quantItens=0;
     int opcao;
     while(opcao != 4){
         printf("\t\t-=-=-=-=-=-=-=MENU COMPRAS=-=-=-=-=-=-=-\n\n");
-        printf("1 - Adicionar ao carrinho\n2 - Exibir/editar carrinho\n3 - Fechar compra\n4 - Voltar\nDigite o numero da opcao desejada: ");
+        printf("1 - Adicionar ao carrinho\n2 - Exibir carrinho\n3 - Fechar compra\n4 - Voltar\nDigite o numero da opcao desejada: ");
         scanf("%d", &opcao);
+        limparBuffer();
         switch (opcao)
         {
         case 1:
@@ -205,18 +207,17 @@ void menuCompra(){
             menuAdicionarAoCarrinho(&novoCarrinho);
             break;
         case 2:
-            //função de exibir/editar o carrinho
+            exibirCarrinho(&novoCarrinho);
             break;
         case 3:
-            //função de fechar compra
+            fecharPedido(&novoCarrinho);
             break;
         default:
-            //mensagem de advertencia
+            printf("ERRO: Opção inválida!");
             break;
         }
     }
     system("cls");
-    menuPrincipal();
 }
 
 void menuAdicionarAoCarrinho(Carrinho *novoCarrinho){
@@ -236,17 +237,17 @@ void menuAdicionarAoCarrinho(Carrinho *novoCarrinho){
             listarProdutos();
             break;
         default:
-            //mensagem de advertencia
+            printf("ERRO: Opção inválida!");
             break;
         }
     }
     system("cls");
-    menuCompra();
+    return;
 }
 
 void adicionarAoCarrinhoPorCodigo(Carrinho *novoCarrinho){
     char codigo[10], linhaProduto[100];
-    int quantidade, quantidadeEstoque, valido;
+    int quantidade, quantidadeEstoque, valido, indiceCarrinho;
     while (valido != 1){
         printf("\t\t-=-=-=ADICIONAR POR CÓDIGO=-=-=-\n\n");
         printf("Digite o código do produto que deseja adicionar: ");
@@ -264,19 +265,22 @@ void adicionarAoCarrinhoPorCodigo(Carrinho *novoCarrinho){
                     printf("\nERRO: A quantidade desejada excede a disponível no estoque.\n");
                     break;
                 }
-            int indiceCarrinho = buscarProdutoNoCarrinho(codigo, novoCarrinho);
-            if (indiceCarrinho == -1)
+            indiceCarrinho = buscarProdutoNoCarrinho(codigo, novoCarrinho);
+            if (indiceCarrinho == (-1))
             {
-                novoCarrinho->itens[indiceCarrinho].quantCarrinho += quantidade;
-            } else {
                 ItemCarrinho novoProduto;
                 sscanf(linhaProduto, "%[^,],%[^,],%f,%*d", novoProduto.codigo, novoProduto.nome, &novoProduto.preco);
                 novoProduto.quantCarrinho = quantidade;
                 novoCarrinho->itens[novoCarrinho->quantItens++] = novoProduto;
+            } else {
+                novoCarrinho->itens[indiceCarrinho].quantCarrinho += quantidade;
             }
         atualizarQuantidadeEstoque(codigo, quantidade);
         printf("Item(ns) adicionado(s) com sucesso ao carrinho!\n");
         valido = 1;    
+            } else {
+                system("cls");
+                return;
             }
         } else {
             printf("\nERRO: O códgio informado não existe no estoque!");
@@ -296,4 +300,40 @@ void mostrarPorCodigo(char codigo[10], char *linha){
         sscanf(linhaProduto, "%[^,],%[^,],%f,%d", codigoProduto, nomeProduto, &precoProduto, &quantProduto);
         printf("| %-7s | %-20s | R$%-7.2f | %-21d |\n", codigoProduto, nomeProduto, precoProduto, quantProduto);
         strcpy(linha, linhaProduto);
+}
+
+void exibirCarrinho(Carrinho *novoCarrinho){
+    printf("\n\t\t-=-=-=CARRINHO=-=-=-\n\n");
+    if (novoCarrinho->quantItens == 0) {
+        printf("O carrinho está vazio!\n");
+    } else {
+        printf("| %-10s | %-20s | %-10s | %-10s |\n", "Código", "Produto", "Quantidade", "Preço");
+        printf("-------------------------------------------------------------\n");
+        for (int i = 0; i < novoCarrinho->quantItens; i++) {
+            printf("| %-10s | %-20s | %-10d | R$%-9.2f |\n", novoCarrinho->itens[i].codigo, novoCarrinho->itens[i].nome, 
+                    novoCarrinho->itens[i].quantCarrinho, novoCarrinho->itens[i].preco);
+        }
+    }
+    printf("\n");
+}
+
+void fecharPedido(Carrinho *novoCarrinho){
+    if (novoCarrinho->quantItens == 0) {
+        printf("O carrinho está vazio! Não há nada para finalizar.\n");
+        return;
+    }
+    float valorTotal = 0.0;
+    printf("\n\t\t-=-=-=FATURA=-=-=-\n\n");
+    printf("| %-10s | %-20s | %-10s | %-10s | %-10s |\n", "Código", "Produto", "Qtd", "Preço Un.", "Subtotal");
+    printf("--------------------------------------------------------------------------\n");
+    for (int i = 0; i < novoCarrinho->quantItens; i++) {
+        float subtotal = novoCarrinho->itens[i].preco * novoCarrinho->itens[i].quantCarrinho;
+        valorTotal += subtotal;
+        printf("| %-10s | %-20s | %-10d | R$%-9.2f | R$%-9.2f |\n", novoCarrinho->itens[i].codigo, 
+                novoCarrinho->itens[i].nome, novoCarrinho->itens[i].quantCarrinho, 
+                novoCarrinho->itens[i].preco, subtotal);
+    }
+    printf("\nValor Total: R$%.2f\n", valorTotal);
+    novoCarrinho->quantItens = 0;
+    printf("\nCompra finalizada com sucesso! O carrinho foi esvaziado.\n");
 }

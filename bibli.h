@@ -34,6 +34,8 @@ void menuCompra();
 void menuAdicionarAoCarrinho(Carrinho *novoCarrinho);
 void adicionarAoCarrinhoPorCodigo(Carrinho *novoCarrinho);
 void mostrarPorCodigo(char codigo[10], char *linha);
+void exibirCarrinho(Carrinho *novoCarrinho);
+void fecharPedido(Carrinho *novoCarrinho);
 FILE *abrirArquivo(const char *modo);
 void limparBuffer();
 int codigoExiste(char *codigoProduto);
